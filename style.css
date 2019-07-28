@@ -1,9 +1,26 @@
 * {
   box-sizing: border-box;
 }
+@import "https://fonts.googleapis.com/css?family=Share+Tech+Mono";
+@font-face {
+  font-family: "Digital";
+  src: url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.eot");
+  src: url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.eot?#iefix")
+      format("embedded-opentype"),
+    url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.woff2")
+      format("woff2"),
+    url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.woff")
+      format("woff"),
+    url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.ttf")
+      format("truetype"),
+    url("//db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.svg#Digital-7")
+      format("svg");
+}
 
 body {
-  background: #f6f6f6;
+  /* background: #f6f6f6;
+   */
+  background-color: #d0e1f9;
   padding-bottom: 30px;
   padding-top: 30px;
 }
@@ -12,20 +29,30 @@ body {
   max-width: 400px;
   border: 2px solid #111;
   border-radius: 5px;
+  background-color: #4d648d;
 }
-#display > input {
+#display-wrapper > input {
   /* background-color: yellow; */
-  background: none;
-  border: none;
-  box-shadow: none;
+  overflow: scroll;
+  font-family: "digital";
+  /* background: none; */
+  /* border: none;
+  box-shadow: none; */
   width: 100%;
+  background-color: #f6f6f6;
+  color: orange;
   border-bottom: 2px solid #111;
   padding: 20px;
   text-align: right;
   font-size: 40px;
 }
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: orange;
+  opacity: 1; /* Firefox */
+}
 
-#calc-keys {
+.calulator-keys {
   padding: 20px;
 
   display: grid;
@@ -46,16 +73,25 @@ body {
   font-size: 22px;
   cursor: pointer;
 }
+button {
+  transition: 2s;
+}
+button:active {
+  background-color: #fff;
+  color: #111;
+}
 
-.is-clear {
+#clear,
+#zero {
   /* grid-column: span 3; */
   grid-column: 1/3;
 }
-.is-zeros {
-  grid-column: 1/3;
-}
 
-.is-equal {
+#equals {
+  background-color: #96ceb4;
   grid-row: 4/6;
   grid-column: 4/5;
+}
+#clear {
+  background-color: #ff6f69;
 }
