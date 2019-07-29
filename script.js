@@ -1,31 +1,20 @@
-class JSCalculator extends React.Component {
+class Calculation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cal: ""
+      equalBtn_clicked: 0
     };
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-  }
-  componentDidMount() {
-    const keys = document.querySelector(".calulator-keys");
-
-    keys.addEventListener("click", e => {
-      if (e.target.matches("button")) {
-        this.handleKeyPress(e);
-      }
-    });
+    this.calculate = this.calculate.bind(this);
   }
 
-  handleKeyPress(event) {
-    console.log(event);
+  calculate(event) {
     let group = "";
-    let first = "";
-    let second = "";
-    let operation = "";
+    let targetID = event.target.id;
+
     if (event.target.attributes["data-group"] !== undefined) {
       group = event.target.attributes["data-group"].value;
     }
-    const operators = { add: "+", subtract: "-", divide: "/", multiply: "*" };
+    const operators = { divide: "/", multiply: "*", add: "+", subtract: "-" };
     const numbers = {
       zero: "0",
       one: 1,
@@ -42,71 +31,154 @@ class JSCalculator extends React.Component {
     if (document.getElementById("display").value == "0") {
       document.getElementById("display").value = "";
     }
+    if (this.state.equalBtn_clicked === 1) {
+      document.getElementById("display").value = "";
+      this.setState({
+        equalBtn_clicked: 0
+      });
+    }
 
     if (group === "op") {
-      // console.log("operands");
-      let operator = operators[event.target.id];
-      document.getElementById("display").value += operator;
-    } else if (numbers[event.target.id]) {
-      // console.log("digits");
-      let number = numbers[event.target.id];
+      let operator = operators[targetID];
+      if (
+        !isNaN(parseFloat(document.getElementById("display").value.slice(-1)))
+      ) {
+        document.getElementById("display").value += operator;
+      }
+    } else if (numbers[targetID]) {
+      let number = numbers[targetID];
       document.getElementById("display").value += number;
-      // console.log(event.target.id.innerText);
     }
-    if (event.target.id === "decimal") {
+    if (targetID === "decimal") {
+      document.getElementById("display").value += ".";
     }
-    if (event.target.id === "clear") {
+    if (targetID === "clear") {
       document.getElementById("display").value = 0;
     }
-    if (event.target.id === "equals") {
+    if (targetID === "equals") {
+      this.setState({
+        equalBtn_clicked: 1
+      });
       let equation = document.getElementById("display").value.split("");
       if (equation.length === 0) {
         return;
       } else if (equation.length === 1) {
         return;
       } else if (equation.length > 1) {
-        // let equation = equation.split("");
         let ii = 0;
         let i = equation.indexOf(Object.keys(operators)[ii]);
         while (i === -1) {
           i = equation.indexOf(operators[Object.keys(operators)[ii]]);
-          console.log(i);
           ii++;
         }
-        console.log(i);
-        first = equation.slice(0, i);
-        first = first.join("");
-        operation = operators[Object.keys(operators)[ii - 1]];
-        second = equation.slice(i + 1);
-        second = second.join("");
-        console.log(first, operation, second);
-        if (operation == "+") {
-          let res = parseFloat(first) + parseFloat(second);
-          document.getElementById("display").value = res;
-        }
-        if (operation == "*") {
-          let res = parseFloat(first) * parseFloat(second);
-          document.getElementById("display").value = res;
-        }
-        if (operation == "-") {
-          let res = parseFloat(first) - parseFloat(second);
-          document.getElementById("display").value = res;
-        }
-        if (operation == "/") {
-          let res = parseFloat(first) / parseFloat(second);
-          document.getElementById("display").value = res;
-        }
-        if (operators[event.target.id] !== undefined) {
-          let a = equation.slice(
-            0,
-            equation.indexOf(operators[event.target.id])
-          );
-          console.log(a);
-
-          console.log(equation);
-        }
+        // let first = equation.slice(i - 1, i).join("");
+        this.handleEqual(equation, operators, numbers);
       }
     }
+  }
+
+  handleEqual(equation, operators, numbers) {
+    let first = "";
+    let second = "";
+    let operation = "";
+    let res = "";
+
+    let ii = 0;
+    let i = equation.indexOf(Object.keys(operators)[ii]);
+    while (i === -1) {
+      i = equation.indexOf(operators[Object.keys(operators)[ii]]);
+      ii++;
+    }
+    console.log("Equation is: " + equation);
+
+    let ccc = 1;
+    while (!isNaN(parseFloat(equation[i - ccc])) || equation[i - ccc] == ".") {
+      ccc++;
+    }
+
+    first = equation.slice(i - (ccc - 1), i).join("");
+    operation = operators[Object.keys(operators)[ii - 1]];
+    if (operation === equation[equation.length - 1]) {
+      return;
+    }
+
+    let cc = 1;
+    while (
+      !isNaN(parseFloat(equation[i + (cc - 1)])) ||
+      equation[i - cc] == "."
+    ) {
+      cc++;
+    }
+    console.log("c" + ccc + "   " + cc);
+    second = equation.slice(i + cc).join("");
+
+    console.log(
+      "First = " + first + ", Operation = " + operation + ", Second = " + second
+    );
+
+    if (operation == "+") {
+      res = parseFloat(first) + parseFloat(second);
+    }
+    if (operation == "*") {
+      res = parseFloat(first) * parseFloat(second);
+    }
+    if (operation == "-") {
+      res = parseFloat(first) - parseFloat(second);
+    }
+    if (operation == "/") {
+      res = parseFloat(first) / parseFloat(second);
+    }
+    if (operators[event.target.id] !== undefined) {
+      let a = equation.slice(0, equation.indexOf(operators[event.target.id]));
+    }
+    document.getElementById("display").value = res;
+
+    console.log(second.length);
+    console.log(res);
+
+    equation.splice(i - 1, 3);
+    equation.splice(i - 1, 0, res.toString());
+
+    console.log(equation);
+    console.log(i + " " + ii);
+
+    if (equation.length === 1) {
+      return;
+    } else {
+      equation.forEach(k => {
+        if (isNaN(k) && k !== ".") {
+          console.log(k);
+          this.handleEqual(equation, operators, numbers);
+        }
+      });
+    }
+  }
+
+  render() {
+    return (
+      <JSCalculator calculate={this.calculate} handleEqual={this.handleEqual} />
+    );
+  }
+}
+
+class JSCalculator extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+  }
+  componentDidMount() {
+    const keys = document.querySelector(".calulator-keys");
+
+    keys.addEventListener("click", e => {
+      if (e.target.matches("button")) {
+        this.handleKeyPress(e);
+      }
+    });
+  }
+
+  handleKeyPress(event) {
+    this.props.calculate(event);
   }
 
   render() {
@@ -116,12 +188,7 @@ class JSCalculator extends React.Component {
           <input id="display" type="text" placeholder="0" />
         </div>
         <div className="calulator-keys">
-          <button
-            /*onClick={this.handleKeyPress}*/
-
-            className="keys"
-            id="clear"
-          >
+          <button className="keys" id="clear">
             AC
           </button>
           <button className="keys" data-group="op" id="divide">
@@ -154,7 +221,7 @@ class JSCalculator extends React.Component {
             6
           </button>
           <button className="keys" data-group="op" id="add">
-            &#43;
+            +
           </button>
 
           <button className="keys" id="one">
@@ -174,7 +241,7 @@ class JSCalculator extends React.Component {
             .
           </button>
           <button className="keys" id="equals">
-            &#61;
+            =
           </button>
         </div>
       </div>
@@ -182,4 +249,4 @@ class JSCalculator extends React.Component {
   }
 }
 
-ReactDOM.render(<JSCalculator />, document.getElementById("App"));
+ReactDOM.render(<Calculation />, document.getElementById("App"));
